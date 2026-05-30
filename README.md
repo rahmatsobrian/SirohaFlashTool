@@ -428,10 +428,8 @@ Script akan:
 **Step 4 — Setelah berhasil**
 ```
 1. Reboot device
-2. Settings → About Phone → Tap MIUI Version 7x (aktifkan Developer Options)
-3. Settings → Developer Options → OEM Unlocking = ON
-4. Masuk Fastboot: adb reboot bootloader
-5. fastboot oem unlock
+2. Masuk Fastboot
+3. fastboot oem device-info untuk cek status ubl
 ```
 
 ---
