@@ -169,7 +169,7 @@ sudo id
 
 ```
 ╔═══════════════════════════════════════════════════╗
-║      ⚡ SIROHA FLASH TOOL — MAIN MENU ⚡          ║
+║      ⚡ SIROHA FLASH TOOL — MAIN MENU ⚡         ║
 ╚═══════════════════════════════════════════════════╝
 
   1.  📦 Instalasi & Cek Requirements
