@@ -78,7 +78,7 @@ Tanpa PC — Flash langsung dari HP ke HP via USB OTG
 
 ## ⚡ Instalasi Cepat (One-liner)
 
-> Jalankan di Termux setelah grant izin root
+> Jalankan di Termux setelah grant izin root atau kamu sudah yakin semuanya sudah siap
 
 ```bash
 # Clone & setup otomatis jika kamu sudah yakin semua bahan sudah terpasang dan terkonfigurasi
