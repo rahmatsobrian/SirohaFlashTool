@@ -641,6 +641,7 @@ Firehose loader diupload ke device via USB, kemudian loader menerima instruksi d
 
 <div align="center">
 
+||
 |---|---|
 | **GitHub** | [rahmatsobrian](https://github.com/rahmatsobrian) |
 | **Telegram** | [t.me/rahmatsobrian](https://t.me/rahmatsobrian) |
