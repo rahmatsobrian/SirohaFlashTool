@@ -1404,7 +1404,6 @@ XMLEOF
           ok "═══════════════════════════════════════"
           ok "  Bypass UBL BERHASIL!"
           ok "  Reboot device."
-          ok "  Settings → Dev Options → OEM Unlock ON"
           ok "═══════════════════════════════════════"
         else
           die "Flash gagal (exit: $exit_code)"
@@ -1444,9 +1443,8 @@ XMLEOF
         echo ""
         echo -e "${Y}  SETELAH BERHASIL:${RESET}"
         echo -e "  ${DIM}  1. Reboot device"
-        echo -e "  2. Settings → About → tap MIUI Version 7x"
-        echo -e "  3. Developer Options → OEM Unlocking = ON"
-        echo -e "  4. fastboot oem unlock${RESET}"
+        echo -e "  2. Masuk ke fastboot"
+        echo -e "  3. fastboot oem device-info${RESET}"
         echo ""
         press_enter
         ;;
