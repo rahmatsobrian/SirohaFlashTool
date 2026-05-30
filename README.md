@@ -169,13 +169,13 @@ sudo id
 
 ```
 ╔═══════════════════════════════════════════════════╗
-║      ⚡ SIROHA FLASH TOOL — MAIN MENU ⚡         ║
+║      ⚡ SIROHA FLASH TOOL — MAIN MENU ⚡          ║
 ╚═══════════════════════════════════════════════════╝
 
   1.  📦 Instalasi & Cek Requirements
   2.  ⚡ QDL Flash (EDL 9008 Mode)
   3.  🔧 Fastboot Flash Tool
-  4.  ☯️  GSI ROM Flash Tool
+  4.  ☯️ GSI ROM Flash Tool
   5.  🆎 A/B Partition Tool
   6.  🔐 FRP Remove Tool
   7.  🔌 USB / OTG Fix Tool
@@ -413,7 +413,7 @@ Harus: V10.2.3.0.NCCMIXM
 adb reboot edl
 
 # Atau hardware:
-# Matikan HP → Tahan Vol+ + Vol- → Colokkan kabel
+# Bongkar HP → Cari titik tespoint & hubungkan kedua titik menggunakan pinset →Colokkan kabel
 ```
 
 **Step 3 — Flash**
@@ -429,7 +429,7 @@ Script akan:
 ```
 1. Reboot device
 2. Masuk Fastboot
-3. fastboot oem device-info untuk cek status ubl
+3. fastboot oem device-info
 ```
 
 ---
