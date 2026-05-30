@@ -587,6 +587,7 @@ menu_fastboot() {
     echo -e "${B}  │ ${W}──${Y}  📁 LAINNYA${B}                               │${RESET}"
     echo -e "${B}  │ ${W}13.${G} ADB Sideload (flash ZIP)                 ${B}│${RESET}"
     echo -e "${B}  │ ${W}14.${G} Manual command fastboot                  ${B}│${RESET}"
+    echo -e "${B}  │ ${W}15.${C} Cek Status UBL (OEM Unlock)              ${B}│${RESET}"
     echo -e "${B}  │ ${W}0.${R}  ← Kembali                                ${B}│${RESET}"
     echo -e "${B}  └──────────────────────────────────────────────┘${RESET}"
     echo ""
@@ -647,6 +648,86 @@ menu_fastboot() {
         echo -ne "${W}  Command (tanpa 'fastboot'): ${RESET}"
         read -e mcmd
         eval "termux-fastboot $mcmd"
+        press_enter
+        ;;
+      15)
+        clear
+        title "🔍 CEK STATUS UBL (OEM Unlock)"
+        echo ""
+        info "Menjalankan: fastboot oem device-info"
+        echo ""
+
+        # Ambil output mentah dari fastboot oem device-info
+        local raw
+        raw=$(termux-fastboot oem device-info 2>&1)
+
+        # Fungsi helper: cetak baris dengan warna sesuai nilai true/false
+        color_bool() {
+          local label="$1" val="$2"
+          if [ "$val" = "true" ]; then
+            echo -e "  ${W}${label}${RESET} ${G}true${RESET}"
+          elif [ "$val" = "false" ]; then
+            echo -e "  ${W}${label}${RESET} ${R}false${RESET}"
+          else
+            echo -e "  ${W}${label}${RESET} ${DIM}${val}${RESET}"
+          fi
+        }
+
+        # Cek ada output tidak
+        if echo "$raw" | grep -qi "bootloader\|tampered\|unlocked\|charger\|panel"; then
+
+          # Parse tiap field, strip prefix "(bootloader) "
+          local tampered unlocked critical charger panel
+          tampered=$(echo "$raw" | grep -i "tampered"          | sed 's/.*(bootloader) //' | xargs)
+          unlocked=$(echo "$raw" | grep -i "Device unlocked"   | sed 's/.*(bootloader) //' | xargs)
+          critical=$(echo "$raw" | grep -i "critical unlocked" | sed 's/.*(bootloader) //' | xargs)
+          charger=$(echo "$raw"  | grep -i "charger screen"    | sed 's/.*(bootloader) //' | xargs)
+          panel=$(echo "$raw"    | grep -i "display panel"     | sed 's/.*(bootloader) //' | xargs)
+
+          # Tampilkan persis format output fastboot asli, tapi warna pada nilainya
+          local t_val u_val c_val ch_val p_val
+          t_val=$(echo "$tampered" | grep -oE '(true|false)' | head -1)
+          u_val=$(echo "$unlocked" | grep -oE '(true|false)' | head -1)
+          c_val=$(echo "$critical" | grep -oE '(true|false)' | head -1)
+          ch_val=$(echo "$charger" | grep -oE '(true|false)' | head -1)
+          p_val=$(echo "$panel"    | sed 's/.*: //' | xargs)
+
+          color_bool "Device tampered:          " "$t_val"
+          echo ""
+          color_bool "Device unlocked:          " "$u_val"
+          echo ""
+          color_bool "Device critical unlocked: " "$c_val"
+          echo ""
+          color_bool "Charger screen enabled:   " "$ch_val"
+          echo ""
+          echo -e "  ${W}Display panel:            ${DIM}${p_val:-"-"}${RESET}"
+          echo ""
+
+          # Kesimpulan singkat
+          echo -e "${C}  ────────────────────────────────────${RESET}"
+          if [ "$u_val" = "true" ]; then
+            ok "Bootloader UNLOCK — siap flash"
+          elif [ "$u_val" = "false" ]; then
+            die "Bootloader LOCKED — belum bisa flash"
+            warn "Developer Options → OEM Unlocking = ON"
+            warn "Lalu jalankan: fastboot oem unlock"
+          fi
+          if [ "$t_val" = "true" ]; then
+            warn "Device pernah dimodifikasi (tampered)"
+          fi
+
+        else
+          # Device tidak terbaca / bukan di fastboot mode
+          die "Tidak ada response dari device!"
+          warn "Pastikan:"
+          warn "  • Device sudah di Fastboot mode"
+          warn "  • Kabel OTG terhubung dengan benar"
+          echo ""
+          echo -e "${DIM}  Raw output:${RESET}"
+          echo -e "${DIM}  $raw${RESET}"
+        fi
+
+        echo ""
         press_enter
         ;;
       0) return ;;

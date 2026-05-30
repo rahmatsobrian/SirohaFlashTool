@@ -1,33 +1,53 @@
+<div align="center">
+
 # ⚡ Siroha Flash Tool
 
-> All-in-one Qualcomm Flash Tool untuk Termux — tanpa PC, langsung dari HP ke HP via USB OTG.
+**All-in-one Qualcomm Flash Tool untuk Termux**  
+Tanpa PC — Flash langsung dari HP ke HP via USB OTG
 
-**Gabungan dari:**
-- [Termux-QDL](https://github.com/Ishu43642/Termux-QDL)
-- [QDL-Flasher](https://github.com/QDL-Flasher)
-- [ADBiFY-QDL](https://github.com/ADBiFY-QDL)
-- [Termux-Root-Recovery-Tool](https://github.com/TRRT)
-- Bypass UBL Redmi 4A by Rahmat Sobrian (port ke Bash)
+[![GitHub stars](https://img.shields.io/github/stars/rahmatsobrian/SirohaFlashTool?style=flat-square&color=yellow)](https://github.com/rahmatsobrian/SirohaFlashTool/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/rahmatsobrian/SirohaFlashTool?style=flat-square&color=blue)](https://github.com/rahmatsobrian/SirohaFlashTool/network)
+[![GitHub release](https://img.shields.io/github/v/release/rahmatsobrian/SirohaFlashTool?style=flat-square&color=green)](https://github.com/rahmatsobrian/SirohaFlashTool/releases)
+[![License](https://img.shields.io/github/license/rahmatsobrian/SirohaFlashTool?style=flat-square)](LICENSE)
+
+</div>
 
 ---
 
 ## 📋 Daftar Isi
 
+- [Tentang](#-tentang)
 - [Syarat](#-syarat)
+- [Instalasi Cepat](#-instalasi-cepat-one-liner)
 - [Struktur File](#-struktur-file)
-- [Cara Install](#-cara-install)
+- [Cara Install Manual](#-cara-install-manual)
 - [Fitur & Menu](#-fitur--menu)
 - [Panduan Lengkap](#-panduan-lengkap)
-  - [Setup Awal](#1-setup-awal)
-  - [QDL Flash (EDL)](#2-qdl-flash-edl-9008)
-  - [Fastboot Flash](#3-fastboot-flash)
+  - [QDL Flash (EDL)](#1-qdl-flash-edl-9008)
+  - [Fastboot Flash](#2-fastboot-flash)
+  - [Cek Status UBL](#3-cek-status-ubl)
   - [GSI ROM Flash](#4-gsi-rom-flash)
   - [A/B Partition](#5-ab-partition-tool)
   - [FRP Remove](#6-frp-remove)
-  - [USB/OTG Fix](#7-usb--otg-fix)
-  - [Bypass UBL Redmi 4A](#8-bypass-ubl-redmi-4a-rolex)
+  - [Bypass UBL Redmi 4A](#7-bypass-ubl-redmi-4a-rolex)
 - [Troubleshooting](#-troubleshooting)
-- [Author](#-author)
+- [Kompatibilitas](#-kompatibilitas)
+- [Kredit](#-source--kredit)
+
+---
+
+## 📌 Tentang
+
+**Siroha Flash Tool** adalah gabungan beberapa tool EDL/Fastboot populer yang diport dan diintegrasikan menjadi satu script Bash interaktif dengan tampilan GUI berbasis terminal — bisa dijalankan langsung di Termux **tanpa PC**.
+
+**Gabungan dari:**
+| Tool | Fungsi |
+|---|---|
+| [Termux-QDL](https://github.com/Ishu43642/Termux-QDL) | QDL binary multi-arch |
+| [QDL-Flasher](https://github.com/QDL-Flasher) | Flash via EDL 9008 |
+| [ADBiFY-QDL](https://github.com/ADBiFY-QDL) | QDL tanpa root |
+| [Termux-Root-Recovery-Tool](https://github.com/TRRT) | Flash fastboot, GSI, recovery |
+| Bypass UBL Redmi 4A *(Rahmat Sobrian)* | Port dari `.bat` ke Bash |
 
 ---
 
@@ -37,9 +57,10 @@
 
 | Syarat | Keterangan |
 |---|---|
-| **Root** | Wajib — akses USB device butuh root |
-| **Termux** | Dari **F-Droid** (BUKAN Play Store!) |
-| **Termux:API** | APK dari **F-Droid** + `pkg install termux-api` |
+| **Root** | **Wajib** — akses USB & QDL butuh root |
+| **Izin root Termux** | Grant via Magisk / KernelSU / APatch |
+| **Termux** | Dari **F-Droid** — BUKAN Play Store! |
+| **Termux:API** | APK dari F-Droid + `pkg install termux-api` |
 | **Arsitektur** | arm64 / arm / x86_64 / x86 (auto-detect) |
 | **USB OTG** | HP host harus support USB Host/OTG |
 
@@ -48,10 +69,45 @@
 | Syarat | Keterangan |
 |---|---|
 | **Chipset** | Qualcomm (untuk QDL/EDL) |
-| **Mode** | EDL (9008) / Fastboot / Recovery — tergantung fitur |
-| **BL Status** | Unlock (untuk Fastboot flash) |
+| **Mode** | EDL 9008 / Fastboot / Recovery |
+| **BL** | Unlock (untuk Fastboot flash) |
 
-> **⚠️ PENTING:** Termux dari Play Store dan F-Droid **tidak kompatibel** satu sama lain. Jika ada salah satu dari Play Store, uninstall dulu lalu install semua dari F-Droid.
+> ⚠️ **Termux dari Play Store dan F-Droid tidak kompatibel!** Jika salah satu dari Play Store, uninstall dulu → install ulang semua dari F-Droid.
+
+---
+
+## ⚡ Instalasi Cepat (One-liner)
+
+> Jalankan di Termux setelah grant izin root
+
+```bash
+# Clone & setup otomatis
+git clone https://github.com/rahmatsobrian/SirohaFlashTool && cd SirohaFlashTool && chmod +x flash.sh bin/*/qdl && ./flash.sh
+```
+
+Atau step per step:
+
+```bash
+# 1. Clone repo
+git clone https://github.com/rahmatsobrian/SirohaFlashTool
+cd SirohaFlashTool
+
+# 2. Beri izin execute
+chmod +x flash.sh
+chmod +x bin/arm64/qdl   # cek arch dulu: uname -m
+
+# 3. Install semua dependensi
+pkg update && pkg upgrade -y
+pkg install -y termux-api git libxml2 sudo curl
+curl -s https://raw.githubusercontent.com/nohajc/termux-adb/master/install.sh | bash
+
+# 4. Setup sudo
+pkg install sudo
+su -c "echo 'ALL ALL=(ALL) NOPASSWD:ALL' > $PREFIX/etc/sudoers.d/termux"
+
+# 5. Jalankan
+./flash.sh
+```
 
 ---
 
@@ -63,86 +119,78 @@ SirohaFlashTool/
 ├── README.md
 │
 ├── bin/                              ← QDL binary (auto-detect arch)
-│   ├── arm64/
-│   │   └── qdl                      ← Untuk HP 64-bit (kebanyakan HP modern)
-│   ├── arm/
-│   │   └── qdl                      ← Untuk HP 32-bit
-│   ├── x86_64/
-│   │   └── qdl
-│   └── x86/
-│       └── qdl
+│   ├── arm64/qdl                     ← HP 64-bit (kebanyakan HP modern)
+│   ├── arm/qdl                       ← HP 32-bit
+│   ├── x86_64/qdl
+│   └── x86/qdl
 │
 └── bypass-ubl/
-    └── Redmi4A-rolex/               ← File khusus Bypass UBL Redmi 4A
-        ├── rahmatsobrian.mbn        ← Firehose loader Redmi 4A (rolex)
-        ├── devinfo                  ← Partition image (UBL flag)
-        ├── emmc_appsboot.mbn        ← Aboot image
-        ├── rawprogram0.xml          ← Partition map (dari ROM MIUI 10.2.3.0)
-        └── patch0.xml               ← Patch table (dari ROM MIUI 10.2.3.0)
+    └── Redmi4A-rolex/
+        ├── rahmatsobrian.mbn         ← Firehose loader Redmi 4A
+        ├── devinfo                   ← Partition image (UBL flag)
+        ├── emmc_appsboot.mbn         ← Aboot image
+        ├── rawprogram0.xml           ← Partition map (dari ROM MIUI 10.2.3.0)
+        └── patch0.xml                ← Patch table
 ```
 
 ---
 
-## 🚀 Cara Install
+## 🚀 Cara Install Manual
 
 ### Langkah 1 — Install Termux & Termux:API dari F-Droid
 
-1. Download F-Droid: https://f-droid.org/F-Droid.apk
-2. Install **Termux** dari F-Droid
-3. Install **Termux:API** dari F-Droid (APK terpisah!)
+```
+1. Download F-Droid → https://f-droid.org/F-Droid.apk
+2. Buka F-Droid → Cari "Termux" → Install
+3. Buka F-Droid → Cari "Termux:API" → Install (APK terpisah!)
+4. Buka Termux → jalankan: pkg install termux-api
+```
 
-> Kedua APK harus dari sumber yang sama (F-Droid) agar bisa saling berkomunikasi.
+> Ada **2 komponen** yang berbeda dan keduanya wajib:
+> - **Termux:API (APK)** — dari F-Droid, sebagai bridge sistem
+> - **termux-api (pkg)** — `pkg install termux-api`, sebagai CLI
 
 ### Langkah 2 — Grant Izin Root ke Termux
 
-Buka aplikasi root manager di HP host:
-
-**Magisk:**
-> Magisk → Superuser → Cari Termux → Toggle ON
-
-**KernelSU:**
-> KernelSU → SuperUser → Cari Termux → Grant
-
-**APatch:**
-> APatch → SuperUser → Grant untuk Termux
-
-Lalu verifikasi di Termux:
-```bash
-su
-# Harus muncul popup izin, tap Grant
-id
-# Output harus: uid=0(root)
+**Via Magisk:**
+```
+Magisk → Superuser → Cari Termux → Toggle ON
 ```
 
-### Langkah 3 — Extract & Setup Tool
-
-```bash
-# Extract zip ke internal storage
-# Buka Termux, lalu:
-
-cd /sdcard/SirohaFlashTool
-
-# Beri permission execute
-chmod +x flash.sh
-chmod +x bin/arm64/qdl    # sesuaikan dengan arch HP kamu
-# cek arch: uname -m
-# aarch64 = arm64, armv7l = arm
+**Via KernelSU:**
+```
+KernelSU → SuperUser → Cari Termux → Granted
 ```
 
-### Langkah 4 — Install Paket yang Dibutuhkan
-
-```bash
-# Jalankan script dulu untuk akses menu install
-./flash.sh
-# Pilih: 1 (Instalasi & Cek Requirements) → 1 (Install semua paket)
+**Via APatch:**
+```
+APatch → SuperUser → Grant untuk Termux
 ```
 
-Atau manual:
+Verifikasi di Termux:
+```bash
+su          # tap Grant pada popup
+id          # harus output: uid=0(root)
+sudo id     # harus output: uid=0(root)
+```
+
+### Langkah 3 — Clone & Setup
+
+```bash
+git clone https://github.com/rahmatsobrian/SirohaFlashTool
+cd SirohaFlashTool
+chmod +x flash.sh bin/arm64/qdl
+```
+
+> Cek arch HP kamu: `uname -m`
+> - `aarch64` → gunakan `bin/arm64/qdl`
+> - `armv7l` → gunakan `bin/arm/qdl`
+
+### Langkah 4 — Install Dependensi
+
 ```bash
 pkg update && pkg upgrade -y
 pkg install -y termux-api git libxml2 sudo curl
-
-# Install ADB & Fastboot
 curl -s https://raw.githubusercontent.com/nohajc/termux-adb/master/install.sh | bash
 ```
 
@@ -151,72 +199,14 @@ curl -s https://raw.githubusercontent.com/nohajc/termux-adb/master/install.sh | 
 ```bash
 pkg install sudo
 su -c "echo 'ALL ALL=(ALL) NOPASSWD:ALL' > $PREFIX/etc/sudoers.d/termux"
-
-# Verifikasi
-sudo id
-# Output: uid=0(root)
+sudo id   # verifikasi: uid=0(root)
 ```
 
-### Langkah 6 — Jalankan
+### Langkah 6 — Cek Requirements
 
 ```bash
 ./flash.sh
-```
-
----
-
-## 🗂️ Fitur & Menu
-
-```
-╔═══════════════════════════════════════════════════╗
-║      ⚡ SIROHA FLASH TOOL — MAIN MENU ⚡          ║
-╚═══════════════════════════════════════════════════╝
-
-  1.  📦 Instalasi & Cek Requirements
-  2.  ⚡ QDL Flash (EDL 9008 Mode)
-  3.  🔧 Fastboot Flash Tool
-  4.  ☯️ GSI ROM Flash Tool
-  5.  🆎 A/B Partition Tool
-  6.  🔐 FRP Remove Tool
-  7.  🔌 USB / OTG Fix Tool
-  8.  📖 Panduan Lengkap
-  9.  🔓 Bypass UBL Redmi 4A (rolex) MIUI 10
-  0.  ✖  Keluar
-```
-
-| Menu | Fungsi Utama |
-|---|---|
-| 1 — Instalasi | Install ADB/Fastboot/termux-api, cek requirements, panduan root & Termux:API |
-| 2 — QDL Flash | Flash Qualcomm via EDL 9008 (EMMC/UFS), reboot ke EDL via ADB/Fastboot |
-| 3 — Fastboot Flash | Flash Recovery/Boot/init_boot/vendor_boot/vbmeta/super, sideload ZIP |
-| 4 — GSI ROM | Flash Generic System Image via FastbootD, erase system, delete logical partition |
-| 5 — A/B Partition | Flash slot _a/_b, set active slot, boot TWRP tanpa flash |
-| 6 — FRP Remove | Reset FRP untuk SPRD / Samsung / MTK via ADB & Fastboot |
-| 7 — USB/OTG Fix | Auto-detect device, restart ADB server, reinstall driver |
-| 8 — Panduan | Guide lengkap step-by-step dalam Bahasa Indonesia |
-| 9 — Bypass UBL | Bypass UBL Redmi 4A (rolex) khusus MIUI 10.2.3.0 via QDL |
-
----
-
-## 📖 Panduan Lengkap
-
-### 1. Setup Awal
-
-#### Install Termux:API dengan benar
-
-Ada **2 komponen** yang berbeda dan keduanya wajib:
-
-| Komponen | Cara Install | Fungsi |
-|---|---|---|
-| **Termux:API (APK)** | Download dari F-Droid | Aplikasi Android yang menjadi bridge |
-| **termux-api (pkg)** | `pkg install termux-api` di Termux | Package CLI untuk memanggil API |
-
-Jika salah satu tidak ada, perintah seperti `termux-usb -l` akan gagal.
-
-#### Cek semua requirements
-
-```bash
-./flash.sh → Menu 1 → Opsi 5
+# Menu 1 → Opsi 5
 ```
 
 Output yang diharapkan:
@@ -241,195 +231,293 @@ Output yang diharapkan:
 
 ---
 
-### 2. QDL Flash (EDL 9008)
+## 🗂️ Fitur & Menu
 
-Gunakan untuk flash firmware Qualcomm lengkap via EDL mode.
+```
+╔═══════════════════════════════════════════════════╗
+║      ⚡ SIROHA FLASH TOOL — MAIN MENU ⚡          ║
+║    Qualcomm EDL • Fastboot • Recovery • GSI       ║
+╚═══════════════════════════════════════════════════╝
 
-#### Persiapan file firmware
+  1.  📦 Instalasi & Cek Requirements
+  2.  ⚡ QDL Flash (EDL 9008 Mode)
+  3.  🔧 Fastboot Flash Tool
+  4.  ☯️  GSI ROM Flash Tool
+  5.  🆎 A/B Partition Tool
+  6.  🔐 FRP Remove Tool
+  7.  🔌 USB / OTG Fix Tool
+  8.  📖 Panduan Lengkap
+  9.  🔓 Bypass UBL Redmi 4A (rolex) MIUI 10
+  0.  ✖  Keluar
+```
+
+| Menu | Sub-fitur |
+|---|---|
+| **1 — Instalasi** | Install paket, reinstall API/ADB, cek requirements, panduan root & Termux:API |
+| **2 — QDL Flash** | Flash EMMC/UFS via EDL 9008, reboot ke EDL via ADB/Fastboot, manual command |
+| **3 — Fastboot Flash** | Flash Recovery/Boot/init_boot/vendor_boot/vbmeta/super, sideload ZIP, **cek status UBL** |
+| **4 — GSI ROM** | Flash GSI via FastbootD, erase system, delete logical partition |
+| **5 — A/B Partition** | Flash slot _a/_b, set active slot, boot TWRP tanpa flash |
+| **6 — FRP Remove** | Reset FRP untuk SPRD / Samsung / MTK |
+| **7 — USB/OTG Fix** | Auto-detect device, restart ADB server, reinstall driver |
+| **8 — Panduan** | Guide lengkap Bahasa Indonesia |
+| **9 — Bypass UBL** | Bypass UBL Redmi 4A (rolex) MIUI 10.2.3.0 via QDL |
+
+---
+
+## 📖 Panduan Lengkap
+
+### 1. QDL Flash (EDL 9008)
+
+#### Persiapan folder firmware
 
 ```
 /sdcard/qdl-flash/
-├── prog_firehose_ddr_XXX.mbn   ← loader (firehose)
+├── prog_firehose_ddr_XXX.mbn   ← firehose loader
 ├── rawprogram0.xml              ← partition map
 └── patch0.xml                   ← patch table
 ```
 
-#### Cara masuk EDL (pilih salah satu)
+#### Cara masuk EDL
 
-**Via ADB** (HP target masih bisa booting):
 ```bash
+# Via ADB (HP target masih bisa booting)
 adb reboot edl
-```
 
-**Via Fastboot** (BL sudah unlock):
-```bash
+# Via Fastboot (BL sudah unlock)
 fastboot oem edl
+
+# Via hardware: test point sesuai skematik device
 ```
 
-**Via hardware** (test point — terakhir):
-- Short test point sesuai skematik device
-
-#### Cara flash
+#### Flash via menu
 
 ```
-./flash.sh → Menu 2 → Opsi 1 (EMMC) atau 2 (UFS)
+./flash.sh → Menu 2 → Opsi 1 (EMMC) / Opsi 2 (UFS)
 ```
 
-1. Masukkan path firehose `.mbn`
-2. Masukkan path `rawprogram0.xml`
-3. Masukkan path `patch0.xml`
-4. Masukkan path folder firmware (untuk `--include`)
-5. Hubungkan HP target ke EDL mode via OTG
-6. Tekan Enter
+#### Flash manual langsung
 
-**Perintah manual (jika ingin langsung):**
 ```bash
+cd SirohaFlashTool
 sudo ./bin/arm64/qdl --debug --storage emmc \
   --include /sdcard/qdl-flash \
-  prog_firehose.mbn rawprogram0.xml patch0.xml
+  /sdcard/qdl-flash/prog_firehose.mbn \
+  /sdcard/qdl-flash/rawprogram0.xml \
+  /sdcard/qdl-flash/patch0.xml
 ```
 
 ---
 
-### 3. Fastboot Flash
+### 2. Fastboot Flash
 
 #### Flash Recovery
 
-```
+```bash
+# Via menu
 ./flash.sh → Menu 3 → Opsi 3
-```
 
-Masukkan path `recovery.img` → otomatis tawari flash `vbmeta.img` setelahnya.
+# Manual
+fastboot flash recovery /sdcard/recovery.img
+```
 
 #### Flash Boot (Magisk patch)
 
-```
+```bash
+# Via menu
 ./flash.sh → Menu 3 → Opsi 4
+
+# Manual
+fastboot flash boot /sdcard/boot_patched.img
 ```
 
-Masukkan path `boot.img` yang sudah di-patch Magisk.
+#### Flash vbmeta (disable-verity)
+
+```bash
+# Via menu
+./flash.sh → Menu 3 → Opsi 7
+
+# Manual
+fastboot --disable-verity --disable-verification flash vbmeta /sdcard/vbmeta.img
+```
 
 #### ADB Sideload
 
-```
+```bash
+# Via menu
 ./flash.sh → Menu 3 → Opsi 13
+
+# Manual (device harus di Recovery → ADB Sideload)
+adb sideload /sdcard/update.zip
 ```
 
-Device harus dalam Recovery mode dengan sideload aktif.
+---
+
+### 3. Cek Status UBL
+
+Cek status bootloader lock/unlock tanpa mengetik manual.
+
+```bash
+# Via menu
+./flash.sh → Menu 3 → Opsi 15
+
+# Manual
+fastboot oem device-info
+```
+
+Output yang ditampilkan:
+
+```
+  Device tampered:          false
+
+  Device unlocked:          true
+
+  Device critical unlocked: true
+
+  Charger screen enabled:   true
+
+  Display panel:            -
+
+  ────────────────────────────────────
+  [✓] Bootloader UNLOCK — siap flash
+```
+
+Nilai `true` ditampilkan **hijau**, `false` ditampilkan **merah**, disertai kesimpulan dan saran langkah selanjutnya.
 
 ---
 
 ### 4. GSI ROM Flash
 
-Urutan yang benar untuk flash GSI:
+Urutan wajib untuk flash GSI (Dynamic Partition):
 
+```bash
+# 1. Flash vbmeta dulu (dari Fastboot mode)
+fastboot --disable-verity --disable-verification flash vbmeta vbmeta.img
+
+# 2. Reboot ke FastbootD
+fastboot reboot fastboot
+
+# 3. Verifikasi userspace
+fastboot getvar is-userspace   # harus: yes
+
+# 4. Hapus system & product
+fastboot erase system
+fastboot delete-logical-partition product_a
+fastboot delete-logical-partition product_b
+
+# 5. Flash GSI
+fastboot flash system gsi.img
+
+# 6. Reboot ke recovery → Format data → Reboot
 ```
-Menu 4 → ikuti urutan:
-1. Flash vbmeta (--disable-verity)
-2. Reboot → FastbootD
-3. Cek is-userspace = yes
-4. Erase system
-5. Delete logical partition product_a & product_b
-6. Flash GSI system image
-7. Reboot → Recovery → Format data
-8. Reboot system
-```
+
+Atau lewat menu: `./flash.sh → Menu 4` (tersedia semua langkah di atas)
 
 ---
 
 ### 5. A/B Partition Tool
 
-Untuk device dengan A/B slot (kebanyakan device Android 10+):
+```bash
+# Flash boot ke slot aktif
+./flash.sh → Menu 5 → Opsi 1
 
-- Flash ke slot spesifik: `boot_a`, `boot_b`, `recovery_a`, dst
-- Set active slot: `--set-active=a` atau `b`
-- Boot TWRP tanpa flash: `fastboot boot twrp.img`
+# Flash ke slot spesifik
+fastboot flash boot_a boot.img
+fastboot flash boot_b boot.img
+
+# Set active slot
+fastboot --set-active=a
+fastboot --set-active=b
+
+# Boot TWRP tanpa flash
+fastboot boot twrp.img
+
+# Cek slot aktif
+fastboot getvar current-slot
+```
 
 ---
 
 ### 6. FRP Remove
 
-| Metode | Target Device |
-|---|---|
-| SPRD via Fastboot | `fastboot erase persist` |
-| Samsung via ADB | Intent + `user_setup_complete=1` |
-| SPRD/MTK via ADB | `user_setup_complete=1` |
-
----
-
-### 7. USB / OTG Fix
-
-Jika device tidak terdeteksi:
-
-```
-Menu 7 → Opsi 9 (Auto-detect & connect device)
-```
-
-Langkah manual:
 ```bash
-# Restart ADB server
-adb kill-server
-adb start-server
+# SPRD via Fastboot
+fastboot erase persist
 
-# Cek USB
-termux-usb -l
+# Samsung / MTK via ADB
+adb shell content insert --uri content://settings/secure \
+  --bind name:s:user_setup_complete --bind value:s:1
 
-# Cek ADB
-adb devices
-
-# Cek Fastboot
-fastboot devices
+# Via menu
+./flash.sh → Menu 6
 ```
 
 ---
 
-### 8. Bypass UBL Redmi 4A (rolex)
+### 7. Bypass UBL Redmi 4A (rolex)
 
-> ⚠️ **KHUSUS** untuk Redmi 4A (codename: **rolex**) dengan MIUI **V10.2.3.0.NCCMIXM** (Global, build 20190605)
+> ⚠️ **KHUSUS** Redmi 4A (codename: **rolex**) — MIUI **V10.2.3.0.NCCMIXM** (Global, build 20190605)  
+> Versi MIUI lain = struktur partisi berbeda = **BRICK!**
 
-#### Mengapa hanya MIUI 10.2.3.0?
+#### Cek versi MIUI dulu
 
-File `devinfo` dan `emmc_appsboot.mbn` dibuat khusus untuk struktur partisi MIUI 10.2.3.0. Versi MIUI lain memiliki layout partisi yang berbeda — menggunakan tool ini pada versi lain **akan menyebabkan BRICK**.
+```
+Settings → About Phone → MIUI Version
+Harus menampilkan: V10.2.3.0.NCCMIXM
+```
 
-#### Partisi yang di-flash (dari rawprogram0.xml ROM asli)
+#### Partisi yang di-flash
+
+> Data diambil langsung dari `rawprogram0.xml` ROM `rolex_global_images_V10.2.3.0.NCCMIXM_20190605`
 
 | Partisi | Start Sector | Hex Address | Size |
 |---|---|---|---|
-| `aboot` | 786432 | `0x18000000` | 2048 sectors (1MB) |
-| `abootbak` | 788480 | `0x18100000` | 2048 sectors (1MB) |
-| `devinfo` | 1052672 | `0x20200000` | 2048 sectors (1MB) |
+| `aboot` | 786432 | `0x18000000` | 2048 sectors (1 MB) |
+| `abootbak` | 788480 | `0x18100000` | 2048 sectors (1 MB) |
+| `devinfo` | 1052672 | `0x20200000` | 2048 sectors (1 MB) |
 
-#### Cara pakai
+#### Cara pakai — via menu
 
-**Step 1 — Cek versi MIUI**
 ```
-Settings → About Phone → MIUI Version
-Harus: V10.2.3.0.NCCMIXM
+./flash.sh → Menu 9 → Opsi 1
 ```
 
-**Step 2 — Masuk EDL**
+#### Cara pakai — manual (untuk yang paham)
+
 ```bash
-# Dari ADB:
+# Step 1 — Masuk EDL
 adb reboot edl
+# atau: tahan Vol+ + Vol- → colok kabel (dari kondisi mati)
 
-# Atau hardware:
-# Bongkar HP → Cari titik tespoint & hubungkan kedua titik menggunakan pinset →Colokkan kabel
+# Step 2 — Flash via QDL
+cd SirohaFlashTool
+
+sudo ./bin/arm64/qdl --debug --storage emmc \
+  --include bypass-ubl/Redmi4A-rolex \
+  bypass-ubl/Redmi4A-rolex/rahmatsobrian.mbn \
+  bypass-ubl/Redmi4A-rolex/rawprogram0.xml \
+  bypass-ubl/Redmi4A-rolex/patch0.xml
 ```
 
-**Step 3 — Flash**
-```
-./flash.sh → Menu 9 → Opsi 1 → Ikuti instruksi
-```
+#### Setelah bypass berhasil
 
-Script akan:
-1. Generate `rawprogram_ubl.xml` secara otomatis dengan sector address yang tepat
-2. Flash `aboot` → `abootbak` → `devinfo` via QDL
+```bash
+# 1. Reboot device
+fastboot reboot
 
-**Step 4 — Setelah berhasil**
-```
-1. Reboot device
-2. Masuk Fastboot
-3. fastboot oem device-info
+# 2. Aktifkan developer options
+# Settings → About Phone → tap MIUI Version 7x
+
+# 3. Aktifkan OEM Unlock
+# Settings → Developer Options → OEM Unlocking = ON
+
+# 4. Unlock bootloader
+adb reboot bootloader
+fastboot oem unlock
+
+# 5. Verifikasi
+fastboot oem device-info
+# Device unlocked: true
 ```
 
 ---
@@ -438,47 +526,73 @@ Script akan:
 
 ### termux-usb tidak mendeteksi device
 
-- Pastikan APK Termux:API terinstall (bukan hanya pkg)
-- Coba cabut-colokan kabel OTG
-- Reinstall: `Menu 1 → Opsi 2`
-- Pastikan kabel OTG support USB Host
+```bash
+# Cek APK Termux:API terinstall
+pm list packages | grep termux.api
+
+# Reinstall via menu
+./flash.sh → Menu 1 → Opsi 2
+
+# Manual
+yes | pkg remove termux-api && pkg install -y termux-api
+```
 
 ### QDL gagal / device not found
 
-- Pastikan HP target benar-benar di EDL mode (LED merah/tidak ada tampilan)
-- Coba `Menu 2 → Opsi 6` (reboot via ADB ke EDL) terlebih dahulu
-- Cek `termux-usb -l` apakah device terdeteksi
-- Pastikan `sudo` berfungsi: `sudo id` harus output `uid=0(root)`
+```bash
+# Cek device terdeteksi
+termux-usb -l
+
+# Cek USB permission
+sudo chmod 666 /dev/bus/usb/*/*
+
+# Cek sudo berjalan
+sudo id   # harus: uid=0(root)
+
+# Pastikan device di EDL (layar mati, LED merah/tidak ada tampilan)
+```
 
 ### ADB device not found
 
-- Aktifkan USB Debugging di HP target
-- Tap "Allow" saat muncul popup USB Debugging
-- Restart ADB server: `Menu 7 → Opsi 4 → 5`
+```bash
+# Restart ADB server
+adb kill-server && adb start-server
+
+# Cek device
+adb devices
+
+# Via menu
+./flash.sh → Menu 7 → Opsi 4, lalu 5
+```
 
 ### Fastboot device not found
 
-- Pastikan HP target di Fastboot mode (layar fastboot)
-- Coba reinstall ADB/Fastboot: `Menu 1 → Opsi 3`
+```bash
+# Pastikan device di Fastboot mode
+fastboot devices
+
+# Reinstall ADB/Fastboot
+./flash.sh → Menu 1 → Opsi 3
+```
 
 ### sudo: command not found
 
 ```bash
 pkg install sudo
 su -c "echo 'ALL ALL=(ALL) NOPASSWD:ALL' > $PREFIX/etc/sudoers.d/termux"
+sudo id
 ```
 
-### QDL binary permission denied
+### QDL: permission denied
 
 ```bash
-chmod +x bin/arm64/qdl   # sesuaikan arch
-sudo bin/arm64/qdl --help  # test
+chmod +x bin/arm64/qdl
+sudo bin/arm64/qdl --help
 ```
 
-### Termux: permission denied untuk /dev/bus/usb
+### /dev/bus/usb: permission denied
 
 ```bash
-# Grant akses USB manual
 sudo chmod 666 /dev/bus/usb/*/*
 ```
 
@@ -495,12 +609,12 @@ HP Target (EDL 9008)
        │
        ▼
 qdl binary membaca:
-  ├── firehose.mbn  → upload ke device sebagai programmer
-  ├── rawprogram.xml → instruksi tulis setiap partisi
-  └── patch.xml     → patch CRC/checksum setelah write
+  ├── firehose.mbn   → diupload ke device sebagai programmer
+  ├── rawprogram.xml → instruksi tulis ke setiap partisi
+  └── patch.xml      → patch CRC/checksum setelah write
 ```
 
-Firehose loader diupload ke device via USB, kemudian loader tersebut menerima instruksi dari host untuk menulis file ke setiap partisi sesuai rawprogram.xml.
+Firehose loader diupload ke device via USB, kemudian loader menerima instruksi dari host untuk menulis file ke partisi sesuai `rawprogram.xml`.
 
 ---
 
@@ -508,12 +622,13 @@ Firehose loader diupload ke device via USB, kemudian loader tersebut menerima in
 
 | Fitur | Chipset | Syarat |
 |---|---|---|
-| QDL Flash | Qualcomm semua | Firehose loader + EDL mode |
+| QDL Flash | Qualcomm (semua) | Firehose loader + EDL mode |
 | Fastboot Flash | Semua | BL unlock |
+| Cek Status UBL | Qualcomm / semua | Fastboot mode |
 | GSI Flash | Semua (Dynamic Partition) | BL unlock + FastbootD |
 | A/B Partition | Semua A/B device | BL unlock |
 | FRP Remove | SPRD / Samsung / MTK | ADB / Fastboot |
-| Bypass UBL | Redmi 4A (rolex) ONLY | MIUI 10.2.3.0 ONLY |
+| Bypass UBL | **Redmi 4A (rolex) ONLY** | **MIUI 10.2.3.0 ONLY** |
 
 ---
 
@@ -522,34 +637,40 @@ Firehose loader diupload ke device via USB, kemudian loader tersebut menerima in
 | Tool | Source |
 |---|---|
 | QDL binary | [Ishu43642/Termux-QDL](https://github.com/Ishu43642/Termux-QDL) |
-| QDL-Flasher | QDL-Flasher (multi-arch binary) |
-| ADBiFY-QDL | ADBiFY-QDL |
-| Termux-Root-Recovery-Tool | TRRT |
+| QDL-Flasher | [QDL-Flasher](https://github.com/QDL-Flasher) (multi-arch binary) |
+| ADBiFY-QDL | [ADBiFY-QDL](https://github.com/ADBiFY-QDL) |
+| Termux-Root-Recovery-Tool | [TRRT](https://github.com/TRRT) |
 | Bypass UBL Redmi 4A | **Rahmat Sobrian** (original `.bat`) |
-| Port Bash + integrasi | **Siroha** (github.com/rahmatsobrian) |
+| Port Bash + integrasi | **[Siroha](https://github.com/rahmatsobrian)** |
 
 ---
 
 ## 👤 Author
 
-```
-Siroha — RahmatSobrian
-GitHub   : github.com/rahmatsobrian
-Telegram : t.me/rahmatsobrian
-YouTube  : @siroha3352
-Lokasi   : Jawa Tengah, Indonesia
-```
+<div align="center">
+
+| | |
+|---|---|
+| **GitHub** | [rahmatsobrian](https://github.com/rahmatsobrian) |
+| **Telegram** | [t.me/rahmatsobrian](https://t.me/rahmatsobrian) |
+| **YouTube** | [@siroha3352](https://youtube.com/@siroha3352) |
+| **Lokasi** | Pekalongan, Jawa Tengah, Indonesia |
+
+</div>
 
 ---
 
 ## ⚠️ Disclaimer
 
-Tool ini dibuat untuk tujuan edukasi dan keperluan pribadi. Segala risiko yang timbul akibat penggunaan tool ini — termasuk brick, kehilangan data, atau kerusakan perangkat — menjadi tanggung jawab pengguna sepenuhnya. Selalu backup data sebelum melakukan flashing apapun.
+Tool ini dibuat untuk tujuan edukasi dan keperluan pribadi. Segala risiko yang timbul — termasuk brick, kehilangan data, atau kerusakan perangkat — menjadi tanggung jawab pengguna sepenuhnya.  
+**Selalu backup data sebelum melakukan flashing apapun.**
 
 ---
 
 <div align="center">
 
 **⚡ Siroha Flash Tool** — Made with ❤️ by [Siroha](https://github.com/rahmatsobrian)
+
+[⭐ Star repo ini](https://github.com/rahmatsobrian/SirohaFlashTool) jika bermanfaat!
 
 </div>
