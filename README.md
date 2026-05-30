@@ -81,7 +81,7 @@ Tanpa PC — Flash langsung dari HP ke HP via USB OTG
 > Jalankan di Termux setelah grant izin root
 
 ```bash
-# Clone & setup otomatis
+# Clone & setup otomatis jika kamu sudah yakin semua bahan sudah terpasang dan terkonfigurasi
 git clone https://github.com/rahmatsobrian/SirohaFlashTool && cd SirohaFlashTool && chmod +x flash.sh bin/*/qdl && ./flash.sh
 ```
 
@@ -242,7 +242,7 @@ Output yang diharapkan:
   1.  📦 Instalasi & Cek Requirements
   2.  ⚡ QDL Flash (EDL 9008 Mode)
   3.  🔧 Fastboot Flash Tool
-  4.  ☯️  GSI ROM Flash Tool
+  4.  ☯️ GSI ROM Flash Tool
   5.  🆎 A/B Partition Tool
   6.  🔐 FRP Remove Tool
   7.  🔌 USB / OTG Fix Tool
@@ -488,6 +488,7 @@ Harus menampilkan: V10.2.3.0.NCCMIXM
 # Step 1 — Masuk EDL
 adb reboot edl
 # atau: tahan Vol+ + Vol- → colok kabel (dari kondisi mati)
+# atau: bongkar hp , cabut fleksibel baterai, cari titik testpoint, pasang fleksibel baterai, hubungkan kedua titik testpoint menggunakan pinset → colok kabel (dari kondisi mati)
 
 # Step 2 — Flash via QDL
 cd SirohaFlashTool
@@ -503,19 +504,12 @@ sudo ./bin/arm64/qdl --debug --storage emmc \
 
 ```bash
 # 1. Reboot device
-fastboot reboot
+Reboot to system
 
-# 2. Aktifkan developer options
-# Settings → About Phone → tap MIUI Version 7x
+# 2. Masuk ke fastboot
+# Gunakan tombol / adb
 
-# 3. Aktifkan OEM Unlock
-# Settings → Developer Options → OEM Unlocking = ON
-
-# 4. Unlock bootloader
-adb reboot bootloader
-fastboot oem unlock
-
-# 5. Verifikasi
+# 3. Verifikasi
 fastboot oem device-info
 # Device unlocked: true
 ```
@@ -649,12 +643,11 @@ Firehose loader diupload ke device via USB, kemudian loader menerima instruksi d
 
 <div align="center">
 
-| | |
 |---|---|
 | **GitHub** | [rahmatsobrian](https://github.com/rahmatsobrian) |
 | **Telegram** | [t.me/rahmatsobrian](https://t.me/rahmatsobrian) |
 | **YouTube** | [@siroha3352](https://youtube.com/@siroha3352) |
-| **Lokasi** | Pekalongan, Jawa Tengah, Indonesia |
+| **Lokasi** | Jawa Tengah, Indonesia |
 
 </div>
 
