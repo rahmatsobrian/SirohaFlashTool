@@ -641,12 +641,11 @@ Firehose loader diupload ke device via USB, kemudian loader menerima instruksi d
 
 <div align="center">
 
-||
+| Social | Link |
 |---|---|
 | **GitHub** | [rahmatsobrian](https://github.com/rahmatsobrian) |
 | **Telegram** | [t.me/rahmatsobrian](https://t.me/rahmatsobrian) |
 | **YouTube** | [@siroha3352](https://youtube.com/@siroha3352) |
-| **Lokasi** | Jawa Tengah, Indonesia |
 
 </div>
 
