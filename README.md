@@ -7,8 +7,6 @@ Tanpa PC — Flash langsung dari HP ke HP via USB OTG
 
 [![GitHub stars](https://img.shields.io/github/stars/rahmatsobrian/SirohaFlashTool?style=flat-square&color=yellow)](https://github.com/rahmatsobrian/SirohaFlashTool/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/rahmatsobrian/SirohaFlashTool?style=flat-square&color=blue)](https://github.com/rahmatsobrian/SirohaFlashTool/network)
-[![GitHub release](https://img.shields.io/github/v/release/rahmatsobrian/SirohaFlashTool?style=flat-square&color=green)](https://github.com/rahmatsobrian/SirohaFlashTool/releases)
-[![License](https://img.shields.io/github/license/rahmatsobrian/SirohaFlashTool?style=flat-square)](LICENSE)
 
 </div>
 
