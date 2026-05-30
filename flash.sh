@@ -414,7 +414,7 @@ menu_qdl() {
     clear
     title "⚡ QDL FLASH — Qualcomm EDL 9008 Mode"
     echo ""
-    echo -e "${DIM}  Gunakan kabel USB OTG untuk menghubungkan HP target (EDL mode)${RESET}"
+    echo -e "${DIM}  Gunakan OTG untuk menghubungkan HP target (EDL mode)${RESET}"
     echo ""
     echo -e "${B}  ┌──────────────────────────────────────────────┐${RESET}"
     echo -e "${B}  │ ${W}1.${G}  📀 Flash EMMC Storage                    ${B}│${RESET}"
@@ -587,7 +587,7 @@ menu_fastboot() {
     echo -e "${B}  │ ${W}──${Y}  📁 LAINNYA${B}                               │${RESET}"
     echo -e "${B}  │ ${W}13.${G} ADB Sideload (flash ZIP)                 ${B}│${RESET}"
     echo -e "${B}  │ ${W}14.${G} Manual command fastboot                  ${B}│${RESET}"
-    echo -e "${B}  │ ${W}15.${C} Cek Status UBL (OEM Unlock)              ${B}│${RESET}"
+    echo -e "${B}  │ ${W}15.${C} Cek Status UBL                           ${B}│${RESET}"
     echo -e "${B}  │ ${W}0.${R}  ← Kembali                                ${B}│${RESET}"
     echo -e "${B}  └──────────────────────────────────────────────┘${RESET}"
     echo ""
@@ -652,7 +652,7 @@ menu_fastboot() {
         ;;
       15)
         clear
-        title "🔍 CEK STATUS UBL (OEM Unlock)"
+        title "🔍 CEK STATUS UBL"
         echo ""
         info "Menjalankan: fastboot oem device-info"
         echo ""
@@ -709,8 +709,6 @@ menu_fastboot() {
             ok "Bootloader UNLOCK — siap flash"
           elif [ "$u_val" = "false" ]; then
             die "Bootloader LOCKED — belum bisa flash"
-            warn "Developer Options → OEM Unlocking = ON"
-            warn "Lalu jalankan: fastboot oem unlock"
           fi
           if [ "$t_val" = "true" ]; then
             warn "Device pernah dimodifikasi (tampered)"
