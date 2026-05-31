@@ -1249,6 +1249,7 @@ main_menu() {
     echo -e "${B}  │ ${W}7.${G}  🔌 USB / OTG Fix Tool                    ${B}│${RESET}"
     echo -e "${B}  │ ${W}8.${Y}  📖 Panduan Lengkap                       ${B}│${RESET}"
     echo -e "${B}  │ ${W}9.${M}  🔓 Bypass UBL Redmi 4A (rolex) MIUI 10   ${B}│${RESET}"
+    echo -e "${B}  │ ${W}10.${C} 🔥 MiTool (Unlock/Flash/Assistant)       ${B}│${RESET}"
     echo -e "${B}  │ ${W}0.${R}  ✖  Keluar                                ${B}│${RESET}"
     echo -e "${B}  └──────────────────────────────────────────────┘${RESET}"
     echo ""
@@ -1267,6 +1268,7 @@ main_menu() {
       7) menu_usbfix ;;
       8) menu_panduan ;;
       9) menu_bypass_ubl ;;
+      10) menu_mitool ;;
       0)
         clear
         echo -e "${G}"
@@ -1554,6 +1556,225 @@ XMLEOF
         echo ""
         echo -e "${Y}  Full rawprogram0.xml ROM tersedia di:${RESET}"
         echo -e "  ${DIM}bypass-ubl/Redmi4A-rolex/rawprogram0.xml${RESET}"
+        press_enter
+        ;;
+
+      0) return ;;
+      *) warn "Pilihan tidak valid!" ; sleep 1 ;;
+    esac
+  done
+}
+
+# ═══════════════════════════════════════════════════════════════
+#   MODUL 10: MITOOL — Xiaomi Unlock / Flash / Assistant
+#   Source: github.com/offici5l/MiTool
+#   Integrasi oleh: Siroha
+# ═══════════════════════════════════════════════════════════════
+menu_mitool() {
+  local TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  local MI_DIR="$TOOL_DIR/mitool"
+
+  while true; do
+    clear
+    echo -e "${C}"
+    echo "  ╔═══════════════════════════════════════════════════╗"
+    echo -e "  ║${Y}    🔥 MITOOL — Xiaomi Flash & Unlock Tool         ${C}║"
+    echo -e "  ║${DIM}        github.com/offici5l/MiTool                 ${C}║"
+    echo "  ╚═══════════════════════════════════════════════════╝"
+    echo -e "${RESET}"
+
+    # Cek python3
+    local py_ok=false
+    command -v python3 &>/dev/null && py_ok=true
+
+    if $py_ok; then
+      ok "python3 : $(python3 --version 2>&1)"
+    else
+      die "python3 : TIDAK ADA — install via opsi 5"
+    fi
+    echo ""
+
+    echo -e "${B}  ┌──────────────────────────────────────────────┐${RESET}"
+    echo -e "${B}  │ ${W}1.${G}  Unlock Bootloader Xiaomi                 ${B}│${RESET}"
+    echo -e "${B}  │ ${W}2.${G}  Flash Fastboot ROM (.tgz / folder)       ${B}│${RESET}"
+    echo -e "${B}  │ ${W}3.${G}  Mi Assistant (Info/Flash Recovery/dll)   ${B}│${RESET}"
+    echo -e "${B}  │ ${W}4.${G}  Firmware Content Extractor               ${B}│${RESET}"
+    echo -e "${B}  │ ${W}5.${C}  Install semua dependensi MiTool          ${B}│${RESET}"
+    echo -e "${B}  │ ${W}6.${Y}  [?] Panduan MiTool                       ${B}│${RESET}"
+    echo -e "${B}  │ ${W}0.${R}  ← Kembali ke Menu Utama                  ${B}│${RESET}"
+    echo -e "${B}  └──────────────────────────────────────────────┘${RESET}"
+    echo ""
+    echo -ne "${C}  Pilih: ${RESET}"
+    read choice
+
+    case "$choice" in
+      1)
+        clear
+        title "🔓 Unlock Bootloader Xiaomi"
+        echo ""
+        if ! command -v python3 &>/dev/null; then
+          die "python3 tidak ada! Jalankan opsi 5 dulu."
+          press_enter; continue
+        fi
+        if ! python3 -c "import miunlock" &>/dev/null 2>&1; then
+          die "Package 'miunlock' belum terinstall!"
+          warn "Jalankan opsi 5 untuk install dependensi."
+          press_enter; continue
+        fi
+        info "Menjalankan miunlock..."
+        echo ""
+        python3 -c "import subprocess; subprocess.run(['miunlock'])" 2>/dev/null || \
+          python3 -m miunlock 2>/dev/null || \
+          miunlock 2>/dev/null || {
+            die "Gagal menjalankan miunlock!"
+            warn "Coba jalankan manual: miunlock"
+          }
+        press_enter
+        ;;
+
+      2)
+        clear
+        title "📦 Flash Fastboot ROM"
+        echo ""
+        if ! command -v python3 &>/dev/null; then
+          die "python3 tidak ada! Jalankan opsi 5 dulu."
+          press_enter; continue
+        fi
+        info "Mencari ROM di /sdcard..."
+        echo ""
+        python3 "$MI_DIR/miflashf.py"
+        press_enter
+        ;;
+
+      3)
+        clear
+        title "📱 Mi Assistant"
+        echo ""
+        if ! command -v python3 &>/dev/null; then
+          die "python3 tidak ada! Jalankan opsi 5 dulu."
+          press_enter; continue
+        fi
+        echo -e "${Y}  Pilihan Mi Assistant:${RESET}"
+        echo -e "  ${W}1${RESET} → Read Info"
+        echo -e "  ${W}2${RESET} → ROMs that can be flashed"
+        echo -e "  ${W}3${RESET} → Flash Official Recovery ROM"
+        echo -e "  ${W}4${RESET} → Format Data"
+        echo -e "  ${W}5${RESET} → Reboot"
+        echo ""
+        python3 "$MI_DIR/miasst.py"
+        press_enter
+        ;;
+
+      4)
+        clear
+        title "🛠️  Firmware Content Extractor"
+        echo ""
+        if ! command -v python3 &>/dev/null; then
+          die "python3 tidak ada! Jalankan opsi 5 dulu."
+          press_enter; continue
+        fi
+        if ! python3 -c "import firmware_content_extractor" &>/dev/null 2>&1; then
+          die "Package 'fcetool' belum terinstall!"
+          warn "Jalankan opsi 5 untuk install dependensi."
+          press_enter; continue
+        fi
+        info "Menjalankan Firmware Content Extractor..."
+        echo ""
+        python3 "$MI_DIR/mifcetool.py"
+        press_enter
+        ;;
+
+      5)
+        clear
+        title "⚙️  Install Dependensi MiTool"
+        echo ""
+        warn "Proses ini membutuhkan koneksi internet."
+        ask_yn "Lanjutkan install?" || { press_enter; continue; }
+        echo ""
+
+        info "Update package..."
+        yes | apt --fix-broken install 2>/dev/null
+        yes | apt update && yes | apt upgrade 2>/dev/null || \
+          pkg update && pkg upgrade -y
+
+        info "Install python3..."
+        yes | pkg install python3
+
+        info "Install libusb & pv..."
+        yes | pkg install libusb pv
+
+        info "Install termux-adb (ADB/Fastboot)..."
+        curl -fsS https://raw.githubusercontent.com/nohajc/termux-adb/master/install.sh | bash
+        ln -sf "$PREFIX/bin/termux-fastboot" "$PREFIX/bin/fastboot" 2>/dev/null
+        ln -sf "$PREFIX/bin/termux-adb" "$PREFIX/bin/adb" 2>/dev/null
+
+        info "Install Python packages (colorama, miunlock, fcetool)..."
+        pip install -U colorama miunlock fcetool --break-system-packages 2>/dev/null || \
+          pip install -U colorama miunlock fcetool
+
+        info "Setup symlink mitool scripts..."
+        cp "$MI_DIR/mitool.py"    "$PREFIX/bin/mitool"    && chmod +x "$PREFIX/bin/mitool"
+        cp "$MI_DIR/miflashf.py"  "$PREFIX/bin/miflashf"  && chmod +x "$PREFIX/bin/miflashf"
+        cp "$MI_DIR/mifcetool.py" "$PREFIX/bin/mifcetool" && chmod +x "$PREFIX/bin/mifcetool"
+        cp "$MI_DIR/miasst.py"    "$PREFIX/bin/miasst"    && chmod +x "$PREFIX/bin/miasst"
+
+        info "Download miasst_termux binary..."
+        local arch_mi
+        arch_mi=$(dpkg --print-architecture 2>/dev/null || echo "$ARCH_DIR")
+        MIASST_URL=$(curl -fsS 'https://api.github.com/repos/offici5l/MiAssistantTool/releases/latest' \
+          2>/dev/null | grep "browser_download_url.*miasst_termux_${arch_mi}" | cut -d'"' -f4)
+        if [ -n "$MIASST_URL" ]; then
+          curl -fsS -L -o "$PREFIX/bin/miasst_termux" "$MIASST_URL" && \
+            chmod +x "$PREFIX/bin/miasst_termux"
+          ok "miasst_termux terdownload!"
+        else
+          warn "miasst_termux tidak bisa didownload (skip)"
+        fi
+
+        echo ""
+        ok "══════════════════════════════════"
+        ok "  Instalasi MiTool selesai!"
+        ok "══════════════════════════════════"
+        press_enter
+        ;;
+
+      6)
+        clear
+        title "[?] PANDUAN MITOOL"
+        echo ""
+        echo -e "${Y}  TENTANG MITOOL:${RESET}"
+        echo -e "  ${DIM}MiTool adalah tool Xiaomi all-in-one dari offici5l."
+        echo -e "  Diintegrasikan ke SirohaFlashTool untuk kemudahan akses.${RESET}"
+        echo ""
+        echo -e "${Y}  FITUR:${RESET}"
+        echo -e "  ${G}1. Unlock Bootloader${RESET}"
+        echo -e "  ${DIM}   Login akun Xiaomi → apply UBL via API resmi Xiaomi${RESET}"
+        echo ""
+        echo -e "  ${G}2. Flash Fastboot ROM${RESET}"
+        echo -e "  ${DIM}   Otomatis scan ROM .tgz di /sdcard"
+        echo -e "   Pilih: flash_all / flash_all_lock / flash_except_data${RESET}"
+        echo ""
+        echo -e "  ${G}3. Mi Assistant${RESET}"
+        echo -e "  ${DIM}   Read info device, flash recovery ROM, format data, reboot${RESET}"
+        echo ""
+        echo -e "  ${G}4. Firmware Content Extractor${RESET}"
+        echo -e "  ${DIM}   Extract file spesifik (boot.img, dll) dari URL ROM"
+        echo -e "   tanpa harus download full ROM${RESET}"
+        echo ""
+        echo -e "${Y}  SYARAT:${RESET}"
+        echo -e "  ${DIM}  • python3 terinstall"
+        echo -e "  • pip packages: miunlock, fcetool, colorama"
+        echo -e "  • Termux:API APK dari F-Droid (untuk Mi Assistant)"
+        echo -e "  • termux-setup-storage sudah dijalankan${RESET}"
+        echo ""
+        echo -e "${Y}  LANGKAH AWAL:${RESET}"
+        echo -e "  ${DIM}  1. Jalankan opsi 5 (Install dependensi)"
+        echo -e "  2. Jalankan termux-setup-storage (izin storage)"
+        echo -e "  3. Pilih fitur yang diinginkan${RESET}"
+        echo ""
+        echo -e "${Y}  SOURCE:${RESET}"
+        echo -e "  ${C}  https://github.com/offici5l/MiTool${RESET}"
+        echo ""
         press_enter
         ;;
 

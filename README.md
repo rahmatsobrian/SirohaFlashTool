@@ -7,6 +7,8 @@ Tanpa PC — Flash langsung dari HP ke HP via USB OTG
 
 [![GitHub stars](https://img.shields.io/github/stars/rahmatsobrian/SirohaFlashTool?style=flat-square&color=yellow)](https://github.com/rahmatsobrian/SirohaFlashTool/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/rahmatsobrian/SirohaFlashTool?style=flat-square&color=blue)](https://github.com/rahmatsobrian/SirohaFlashTool/network)
+[![GitHub release](https://img.shields.io/github/v/release/rahmatsobrian/SirohaFlashTool?style=flat-square&color=green)](https://github.com/rahmatsobrian/SirohaFlashTool/releases)
+[![License](https://img.shields.io/github/license/rahmatsobrian/SirohaFlashTool?style=flat-square&color=orange)](LICENSE)
 
 </div>
 
@@ -28,6 +30,7 @@ Tanpa PC — Flash langsung dari HP ke HP via USB OTG
   - [A/B Partition](#5-ab-partition-tool)
   - [FRP Remove](#6-frp-remove)
   - [Bypass UBL Redmi 4A](#7-bypass-ubl-redmi-4a-rolex)
+  - [MiTool](#8-mitool)
 - [Troubleshooting](#-troubleshooting)
 - [Kompatibilitas](#-kompatibilitas)
 - [Kredit](#-source--kredit)
@@ -39,12 +42,14 @@ Tanpa PC — Flash langsung dari HP ke HP via USB OTG
 **Siroha Flash Tool** adalah gabungan beberapa tool EDL/Fastboot populer yang diport dan diintegrasikan menjadi satu script Bash interaktif dengan tampilan GUI berbasis terminal — bisa dijalankan langsung di Termux **tanpa PC**.
 
 **Gabungan dari:**
+
 | Tool | Fungsi |
 |---|---|
 | [Termux-QDL](https://github.com/Ishu43642/Termux-QDL) | QDL binary multi-arch |
 | [QDL-Flasher](https://github.com/QDL-Flasher) | Flash via EDL 9008 |
 | [ADBiFY-QDL](https://github.com/ADBiFY-QDL) | QDL tanpa root |
 | [Termux-Root-Recovery-Tool](https://github.com/TRRT) | Flash fastboot, GSI, recovery |
+| [MiTool](https://github.com/offici5l/MiTool) | Xiaomi unlock, flash, assistant |
 | Bypass UBL Redmi 4A *(Rahmat Sobrian)* | Port dari `.bat` ke Bash |
 
 ---
@@ -115,12 +120,19 @@ su -c "echo 'ALL ALL=(ALL) NOPASSWD:ALL' > $PREFIX/etc/sudoers.d/termux"
 SirohaFlashTool/
 ├── flash.sh                          ← Script utama (jalankan ini!)
 ├── README.md
+├── LICENSE
 │
 ├── bin/                              ← QDL binary (auto-detect arch)
 │   ├── arm64/qdl                     ← HP 64-bit (kebanyakan HP modern)
 │   ├── arm/qdl                       ← HP 32-bit
 │   ├── x86_64/qdl
 │   └── x86/qdl
+│
+├── mitool/                           ← MiTool scripts (Python)
+│   ├── mitool.py                     ← Menu utama MiTool
+│   ├── miflashf.py                   ← Flash Fastboot ROM
+│   ├── miasst.py                     ← Mi Assistant
+│   └── mifcetool.py                  ← Firmware Content Extractor
 │
 └── bypass-ubl/
     └── Redmi4A-rolex/
@@ -240,12 +252,13 @@ Output yang diharapkan:
   1.  📦 Instalasi & Cek Requirements
   2.  ⚡ QDL Flash (EDL 9008 Mode)
   3.  🔧 Fastboot Flash Tool
-  4.  ☯️ GSI ROM Flash Tool
+  4.  🔮 GSI ROM Flash Tool
   5.  🆎 A/B Partition Tool
   6.  🔐 FRP Remove Tool
   7.  🔌 USB / OTG Fix Tool
   8.  📖 Panduan Lengkap
   9.  🔓 Bypass UBL Redmi 4A (rolex) MIUI 10
+  10. 🛠️  MiTool (Xiaomi Unlock/Flash/Assistant)
   0.  ✖  Keluar
 ```
 
@@ -260,6 +273,7 @@ Output yang diharapkan:
 | **7 — USB/OTG Fix** | Auto-detect device, restart ADB server, reinstall driver |
 | **8 — Panduan** | Guide lengkap Bahasa Indonesia |
 | **9 — Bypass UBL** | Bypass UBL Redmi 4A (rolex) MIUI 10.2.3.0 via QDL |
+| **10 — MiTool** | Xiaomi UBL apply, flash fastboot ROM, Mi Assistant, firmware extractor |
 
 ---
 
@@ -483,10 +497,12 @@ Harus menampilkan: V10.2.3.0.NCCMIXM
 #### Cara pakai — manual (untuk yang paham)
 
 ```bash
-# Step 1 — Masuk EDL
+# Step 1 — Masuk EDL (pilih salah satu)
 adb reboot edl
 # atau: tahan Vol+ + Vol- → colok kabel (dari kondisi mati)
-# atau: bongkar hp , cabut fleksibel baterai, cari titik testpoint, pasang fleksibel baterai, hubungkan kedua titik testpoint menggunakan pinset → colok kabel (dari kondisi mati)
+# atau: bongkar HP, cabut fleksibel baterai, cari titik testpoint,
+#       pasang fleksibel baterai, hubungkan kedua titik testpoint
+#       menggunakan pinset → colok kabel (dari kondisi mati)
 
 # Step 2 — Flash via QDL
 cd SirohaFlashTool
@@ -501,15 +517,99 @@ sudo ./bin/arm64/qdl --debug --storage emmc \
 #### Setelah bypass berhasil
 
 ```bash
-# 1. Reboot device
-Reboot to system
+# 1. Reboot ke system
+# tekan tombol power atau cabut-colok kabel
 
-# 2. Masuk ke fastboot
-# Gunakan tombol / adb
+# 2. Aktifkan Developer Options
+# Settings → About Phone → tap MIUI Version 7x
 
-# 3. Verifikasi
+# 3. Aktifkan OEM Unlock
+# Settings → Developer Options → OEM Unlocking = ON
+
+# 4. Masuk Fastboot & verifikasi
+adb reboot bootloader
 fastboot oem device-info
 # Device unlocked: true
+```
+
+---
+
+### 8. MiTool
+
+Tool khusus Xiaomi dari [offici5l/MiTool](https://github.com/offici5l/MiTool) yang diintegrasikan langsung ke dalam SirohaFlashTool.
+
+```
+./flash.sh → Menu 10
+```
+
+#### Install dependensi MiTool (wajib pertama kali)
+
+```bash
+# Via menu (direkomendasikan)
+./flash.sh → Menu 10 → Opsi 5
+
+# Manual
+pkg install python3 libusb pv
+pip install -U colorama miunlock fcetool
+```
+
+#### Unlock Bootloader Xiaomi (apply UBL)
+
+```bash
+# Via menu
+./flash.sh → Menu 10 → Opsi 1
+
+# Manual
+miunlock
+```
+
+Proses: login akun Xiaomi → apply UBL via API resmi Xiaomi.
+
+#### Flash Fastboot ROM
+
+```bash
+# Via menu (otomatis scan ROM di /sdcard)
+./flash.sh → Menu 10 → Opsi 2
+```
+
+Mendukung:
+
+| Script | Fungsi |
+|---|---|
+| `flash_all.sh` | Flash semua partisi tanpa lock BL |
+| `flash_all_lock.sh` | Flash semua + lock bootloader |
+| `flash_all_except_data_storage.sh` | Flash tanpa hapus data |
+| `flash_all_except_storage.sh` | Flash tanpa hapus storage |
+
+Format ROM: folder extracted atau file `.tgz` langsung.
+
+#### Mi Assistant
+
+```bash
+# Via menu
+./flash.sh → Menu 10 → Opsi 3
+```
+
+| Pilihan | Fungsi |
+|---|---|
+| 1 | Read Info device |
+| 2 | ROMs that can be flashed |
+| 3 | Flash Official Recovery ROM |
+| 4 | Format Data |
+| 5 | Reboot |
+
+> Butuh **Termux:API APK** dari F-Droid dan `termux-setup-storage` sudah dijalankan.
+
+#### Firmware Content Extractor
+
+```bash
+# Via menu
+./flash.sh → Menu 10 → Opsi 4
+
+# Contoh: extract boot.img dari URL ROM tanpa download full ROM
+# Enter ROM URL : https://.../rolex_global_images_V10.2.3.0.tgz
+# Enter filename: boot.img
+# → Output      : /sdcard/fcetool_files/boot.img
 ```
 
 ---
@@ -588,6 +688,25 @@ sudo bin/arm64/qdl --help
 sudo chmod 666 /dev/bus/usb/*/*
 ```
 
+### MiTool: ModuleNotFoundError
+
+```bash
+# Install ulang dependensi
+pip install -U colorama miunlock fcetool --break-system-packages
+
+# Atau via menu
+./flash.sh → Menu 10 → Opsi 5
+```
+
+### MiTool: miasst_termux not found
+
+```bash
+# Download manual sesuai arch HP kamu (cek: uname -m)
+curl -L -o $PREFIX/bin/miasst_termux \
+  "https://github.com/offici5l/MiAssistantTool/releases/latest/download/miasst_termux_aarch64"
+chmod +x $PREFIX/bin/miasst_termux
+```
+
 ---
 
 ## 🏗️ Cara Kerja QDL Flash
@@ -621,6 +740,10 @@ Firehose loader diupload ke device via USB, kemudian loader menerima instruksi d
 | A/B Partition | Semua A/B device | BL unlock |
 | FRP Remove | SPRD / Samsung / MTK | ADB / Fastboot |
 | Bypass UBL | **Redmi 4A (rolex) ONLY** | **MIUI 10.2.3.0 ONLY** |
+| MiTool — Unlock BL | Xiaomi (semua) | Akun Mi + eligible UBL |
+| MiTool — Flash ROM | Xiaomi Fastboot ROM | Fastboot mode + BL unlock |
+| MiTool — Assistant | Xiaomi | Termux:API + storage permission |
+| MiTool — FCE | Semua | URL ROM publik + python3 |
 
 ---
 
@@ -632,6 +755,7 @@ Firehose loader diupload ke device via USB, kemudian loader menerima instruksi d
 | QDL-Flasher | [QDL-Flasher](https://github.com/QDL-Flasher) (multi-arch binary) |
 | ADBiFY-QDL | [ADBiFY-QDL](https://github.com/ADBiFY-QDL) |
 | Termux-Root-Recovery-Tool | [TRRT](https://github.com/TRRT) |
+| MiTool | [offici5l/MiTool](https://github.com/offici5l/MiTool) |
 | Bypass UBL Redmi 4A | **Rahmat Sobrian** (original `.bat`) |
 | Port Bash + integrasi | **[Siroha](https://github.com/rahmatsobrian)** |
 
