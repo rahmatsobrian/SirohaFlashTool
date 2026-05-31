@@ -13,6 +13,8 @@ Tanpa PC — Flash langsung dari HP ke HP via USB OTG
 </div>
 
 ---
+![Screenshot](Screenshot_20260531-220607.jpg)
+---
 
 ## 📋 Daftar Isi
 
