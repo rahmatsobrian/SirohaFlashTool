@@ -159,15 +159,20 @@ menu_install() {
         pkg update -y && pkg upgrade -y
         info "Install termux-api (pkg)..."
         pkg install -y termux-api
-        info "Install git, libxml2, sudo, curl..."
-        pkg install -y git libxml2 sudo curl
+        info "Install git, python3, libxml2, libusb, pv, sudo, curl..."
+        pkg install -y git python3 libxml2 libusb pv sudo curl
         info "Install ADB/Fastboot (termux-adb)..."
         pkg remove -y termux-adb 2>/dev/null
         curl -s https://raw.githubusercontent.com/nohajc/termux-adb/master/install.sh | bash
         ln -sf "$PREFIX/bin/termux-fastboot" "$PREFIX/bin/fastboot" 2>/dev/null
         ln -sf "$PREFIX/bin/termux-adb" "$PREFIX/bin/adb" 2>/dev/null
+        info "Install Python packages untuk MiTool (colorama, miunlock, fcetool)..."
+        pip install -U colorama miunlock fcetool --break-system-packages 2>/dev/null || \
+          pip install -U colorama miunlock fcetool
+        info "Setup sudo NOPASSWD..."
+        su -c "echo 'ALL ALL=(ALL) NOPASSWD:ALL' > $PREFIX/etc/sudoers.d/termux" 2>/dev/null
         echo ""
-        ok "Semua paket berhasil diinstall!"
+        ok "Semua paket berhasil diinstall (git, python3, libxml2, libusb, pv, sudo, curl, adb, fastboot, pip packages)!"
         echo ""
         warn "PENTING: Pastikan aplikasi Termux:API juga sudah terinstall!"
         warn "Bukan hanya pkg termux-api, tapi APK-nya juga!"
@@ -284,6 +289,40 @@ menu_install() {
         else
           die "QDL binary         : TIDAK ADA"
           warn "  → Letakkan file 'qdl' di folder bin/$ARCH_DIR/"
+        fi
+
+        echo ""
+        # ── Cek PAKET DASAR ────────────────────────────────────
+        echo -e "${Y}  [ PAKET DASAR ]${RESET}"
+        if command -v git &>/dev/null; then
+          ok "git                : TERINSTALL"
+        else
+          die "git                : TIDAK ADA  → jalankan opsi 1"
+        fi
+        if command -v python3 &>/dev/null; then
+          ok "python3            : TERINSTALL"
+        else
+          die "python3            : TIDAK ADA  → jalankan opsi 1"
+        fi
+        if command -v curl &>/dev/null; then
+          ok "curl               : TERINSTALL"
+        else
+          die "curl               : TIDAK ADA  → jalankan opsi 1"
+        fi
+        if [ -f "$PREFIX/lib/libxml2.so" ] || [ -f "$PREFIX/lib/libxml2.so.2" ]; then
+          ok "libxml2            : TERINSTALL"
+        else
+          die "libxml2            : TIDAK ADA  → jalankan opsi 1"
+        fi
+        if command -v pv &>/dev/null; then
+          ok "pv                 : TERINSTALL"
+        else
+          die "pv                 : TIDAK ADA  → jalankan opsi 1"
+        fi
+        if [ -f "$PREFIX/lib/libusb-1.0.so" ] || [ -f "$PREFIX/lib/libusb-1.0.so.0" ]; then
+          ok "libusb             : TERINSTALL"
+        else
+          die "libusb             : TIDAK ADA  → jalankan opsi 1"
         fi
 
         echo ""
@@ -1697,8 +1736,8 @@ menu_mitool() {
         yes | apt update && yes | apt upgrade 2>/dev/null || \
           pkg update && pkg upgrade -y
 
-        info "Install python3..."
-        yes | pkg install python3
+        info "Install git & python3..."
+        yes | pkg install git python3
 
         info "Install libusb & pv..."
         yes | pkg install libusb pv

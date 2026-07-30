@@ -66,6 +66,8 @@ Tanpa PC — Flash langsung dari HP ke HP via USB OTG
 | **Izin root Termux** | Grant via Magisk / KernelSU / APatch |
 | **Termux** | Dari **F-Droid** — BUKAN Play Store! |
 | **Termux:API** | APK dari F-Droid + `pkg install termux-api` |
+| **git** | `pkg install git` — untuk clone & update repo |
+| **python3** | `pkg install python3` — wajib untuk MiTool (Menu 10) |
 | **Arsitektur** | arm64 / arm / x86_64 / x86 (auto-detect) |
 | **USB OTG** | HP host harus support USB Host/OTG |
 
@@ -86,6 +88,9 @@ Tanpa PC — Flash langsung dari HP ke HP via USB OTG
 > Jalankan di Termux setelah grant izin root atau kamu sudah yakin semuanya sudah siap
 
 ```bash
+# Install dependensi dasar dulu (git & python3 belum tentu ada di Termux baru)
+pkg update && pkg upgrade -y && pkg install -y git python3
+
 # Clone & setup otomatis jika kamu sudah yakin semua bahan sudah terpasang dan terkonfigurasi
 git clone https://github.com/rahmatsobrian/SirohaFlashTool && cd SirohaFlashTool && chmod +x flash.sh bin/*/qdl && ./flash.sh
 ```
@@ -93,26 +98,31 @@ git clone https://github.com/rahmatsobrian/SirohaFlashTool && cd SirohaFlashTool
 Atau step per step:
 
 ```bash
-# 1. Clone repo
+# 1. Install git & python3 (dibutuhkan untuk clone repo & MiTool)
+pkg update && pkg upgrade -y
+pkg install -y git python3
+
+# 2. Clone repo
 git clone https://github.com/rahmatsobrian/SirohaFlashTool
 cd SirohaFlashTool
 
-# 2. Beri izin execute
+# 3. Beri izin execute
 chmod +x flash.sh
 chmod +x bin/arm64/qdl   # cek arch dulu: uname -m
 
-# 3. Install semua dependensi
-pkg update && pkg upgrade -y
-pkg install -y termux-api git libxml2 sudo curl
+# 4. Install semua dependensi lainnya
+pkg install -y termux-api libxml2 libusb pv sudo curl
 curl -s https://raw.githubusercontent.com/nohajc/termux-adb/master/install.sh | bash
+pip install -U colorama miunlock fcetool --break-system-packages
 
-# 4. Setup sudo
-pkg install sudo
+# 5. Setup sudo
 su -c "echo 'ALL ALL=(ALL) NOPASSWD:ALL' > $PREFIX/etc/sudoers.d/termux"
 
-# 5. Jalankan
+# 6. Jalankan
 ./flash.sh
 ```
+
+> 💡 Kamu juga bisa langsung jalankan `./flash.sh` → **Menu 1 → Opsi 1** untuk auto-install semua paket di atas sekaligus (git, python3, libxml2, libusb, pv, sudo, curl, adb, fastboot, dan pip packages MiTool) dalam satu perintah.
 
 ---
 
@@ -186,9 +196,12 @@ id          # harus output: uid=0(root)
 sudo id     # harus output: uid=0(root)
 ```
 
-### Langkah 3 — Clone & Setup
+### Langkah 3 — Install git & python3, lalu Clone Repo
 
 ```bash
+pkg update && pkg upgrade -y
+pkg install -y git python3
+
 git clone https://github.com/rahmatsobrian/SirohaFlashTool
 cd SirohaFlashTool
 chmod +x flash.sh bin/arm64/qdl
@@ -198,18 +211,19 @@ chmod +x flash.sh bin/arm64/qdl
 > - `aarch64` → gunakan `bin/arm64/qdl`
 > - `armv7l` → gunakan `bin/arm/qdl`
 
-### Langkah 4 — Install Dependensi
+### Langkah 4 — Install Dependensi Lainnya
 
 ```bash
-pkg update && pkg upgrade -y
-pkg install -y termux-api git libxml2 sudo curl
+pkg install -y termux-api libxml2 libusb pv sudo curl
 curl -s https://raw.githubusercontent.com/nohajc/termux-adb/master/install.sh | bash
+pip install -U colorama miunlock fcetool --break-system-packages
 ```
+
+> Atau cukup jalankan `./flash.sh` → **Menu 1 → Opsi 1** untuk auto-install semuanya (termasuk git & python3 jika belum ada).
 
 ### Langkah 5 — Setup sudo
 
 ```bash
-pkg install sudo
 su -c "echo 'ALL ALL=(ALL) NOPASSWD:ALL' > $PREFIX/etc/sudoers.d/termux"
 sudo id   # verifikasi: uid=0(root)
 ```
@@ -239,6 +253,14 @@ Output yang diharapkan:
 [ QDL BINARY ]
 [✓] QDL binary         : ADA (bin/arm64/qdl)
 [✓] QDL executable     : OK
+
+[ PAKET DASAR ]
+[✓] git                : TERINSTALL
+[✓] python3            : TERINSTALL
+[✓] curl               : TERINSTALL
+[✓] libxml2            : TERINSTALL
+[✓] pv                 : TERINSTALL
+[✓] libusb             : TERINSTALL
 ```
 
 ---
@@ -551,8 +573,8 @@ Tool khusus Xiaomi dari [offici5l/MiTool](https://github.com/offici5l/MiTool) ya
 ./flash.sh → Menu 10 → Opsi 5
 
 # Manual
-pkg install python3 libusb pv
-pip install -U colorama miunlock fcetool
+pkg install git python3 libusb pv
+pip install -U colorama miunlock fcetool --break-system-packages
 ```
 
 #### Unlock Bootloader Xiaomi (apply UBL)
