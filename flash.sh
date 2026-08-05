@@ -83,6 +83,10 @@ if [ ! -f "$QDL_BIN" ]; then
   QDL_BIN="$SCRIPT_DIR/qdl"
 fi
 
+# ─── FASTBOOT FILE DIRECTORY ───────────────────────────────────
+FASTBOOT_DIR="/storage/downloads/fastbootfile"
+mkdir -p "$FASTBOOT_DIR"
+
 # ─── SPLASH SCREEN ─────────────────────────────────────────────
 splash_screen() {
   clear
@@ -683,11 +687,61 @@ menu_fastboot() {
         press_enter
         ;;
       14)
-        title "Manual Fastboot Command"
-        echo -ne "${W}  Command (tanpa 'fastboot'): ${RESET}"
-        read -e mcmd
-        eval "termux-fastboot $mcmd"
-        press_enter
+      title "Manual Fastboot Command"
+      
+      mkdir -p "$FASTBOOT_DIR"
+      
+     echo -e "${Y}Taruh semua file yang kamu butuhkan ke folder Fastboot.${RESET}"
+     echo ""
+     echo -e "${Y}Lokasi Folder Fastboot:${RESET}"
+     echo -e "  ${W}$FASTBOOT_DIR${RESET}"
+     echo ""
+     echo -e "${DIM}Contoh file: boot.img, recovery.img, twrp.img, vbmeta.img${RESET}"
+     echo ""
+      
+      if ls "$FASTBOOT_DIR" >/dev/null 2>&1; then
+          echo -e "${Y}File tersedia:${RESET}"
+          ls -1 "$FASTBOOT_DIR" | sed 's/^/  • /'
+      else
+          echo -e "${DIM}(Belum ada file)${RESET}"
+      fi
+      
+      echo ""
+      echo -e "${G}Gunakan command tanpa 'fastboot' ${RESET}"
+      echo -e "${G}Contoh penggunaan command tanpa 'fastboot':${RESET}"
+      echo "  boot twrp.img"
+      echo "  flash boot boot.img"
+      echo "  flash recovery recovery.img"
+      echo "  flash vbmeta vbmeta.img"
+      echo ""
+      echo -ne "${W}fastboot > ${RESET}"
+      
+      read -e mcmd
+      args=()
+      for arg in $mcmd; do
+      
+      # Kalau sudah berupa path, biarkan
+      if [[ "$arg" == /* ]]; then
+          args+=("$arg")
+          continue
+      fi
+      
+      # Kalau file ada di folder fastbootfile, pakai path lengkap
+      if [ -f "$FASTBOOT_DIR/$arg" ]; then
+          args+=("$FASTBOOT_DIR/$arg")
+      else
+          args+=("$arg")
+      fi
+      
+      done
+      echo ""
+      info "Menjalankan:"
+      echo "termux-fastboot ${args[*]}"
+      echo ""
+      
+      termux-fastboot "${args[@]}"
+      
+      press_enter
         ;;
       15)
         clear
