@@ -740,6 +740,13 @@ menu_fastboot() {
       info "Menjalankan:"
       echo "termux-fastboot ${args[*]}"
       echo ""
+
+      # Cek apakah device Fastboot terdeteksi
+      if ! termux-fastboot devices | grep -q "fastboot"; then
+        echo -e "${R}Error: Tidak ada device yang terdeteksi!${RESET}"
+        press_enter
+        continue
+      fi
       
       termux-fastboot "${args[@]}"
       
