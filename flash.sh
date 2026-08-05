@@ -84,7 +84,7 @@ if [ ! -f "$QDL_BIN" ]; then
 fi
 
 # ─── FASTBOOT FILE DIRECTORY ───────────────────────────────────
-FASTBOOT_DIR="/storage/downloads/fastbootfile"
+FASTBOOT_DIR="$HOME/storage/downloads/fastbootfile"
 mkdir -p "$FASTBOOT_DIR"
 
 # ─── SPLASH SCREEN ─────────────────────────────────────────────
