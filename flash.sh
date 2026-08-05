@@ -85,6 +85,8 @@ fi
 
 # ─── FASTBOOT FILE DIRECTORY ───────────────────────────────────
 FASTBOOT_DIR="$HOME/storage/downloads/fastbootfile"
+FASTBOOT_DISPLAY="/sdcard/Download/fastbootfile"
+
 mkdir -p "$FASTBOOT_DIR"
 
 # ─── SPLASH SCREEN ─────────────────────────────────────────────
@@ -694,8 +696,8 @@ menu_fastboot() {
      echo -e "${Y}Taruh semua file yang kamu butuhkan ke folder Fastboot.${RESET}"
      echo ""
      echo -e "${Y}Lokasi Folder Fastboot:${RESET}"
-     echo -e "  ${W}$FASTBOOT_DIR${RESET}"
-     echo ""
+     echo -e "  ${W}$FASTBOOT_DISPLAY${RESET}"
+     echo -e "${DIM}  (Penyimpanan Internal > Download > fastbootfile)${RESET}"
      echo -e "${DIM}Contoh file: boot.img, recovery.img, twrp.img, vbmeta.img${RESET}"
      echo ""
       
